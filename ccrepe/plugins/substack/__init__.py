@@ -9,6 +9,5 @@ class SubstackPlugin(CrepePlugin):
 
 plugin = SubstackPlugin(
     name="Substack PR",
-    target="https://druivenheks.substack.com/p/pattern-recognition-and-consequences"
+    target="https://druivenheks.substack.com/p/pattern-recognition-and-consequences",
 )
-

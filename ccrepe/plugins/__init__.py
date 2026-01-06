@@ -1,12 +1,13 @@
-from pydantic import BaseModel, HttpUrl
-from typing import Optional
-from abc import ABC
-import requests
-from bs4 import BeautifulSoup
-import markdownify
-from lxml import html, etree
 import json
+from abc import ABC
+from typing import Optional
+
+import markdownify
+import requests
 import yaml
+from bs4 import BeautifulSoup
+from lxml import etree, html
+from pydantic import BaseModel, HttpUrl
 
 
 # wrapper for fetching so we don't repeat this code in each plugin
@@ -21,7 +22,7 @@ class WebFetcher:
         parser = html.HTMLParser(
             remove_comments=True,
             remove_pis=True,
-            recover=True # don't choke when we get garbage html
+            recover=True,  # don't choke when we get garbage html
         )
 
         # stringify de htmllen
@@ -32,7 +33,7 @@ class WebFetcher:
             doc,
             method="xml",
             encoding="utf-8",
-            pretty_print=True # ignore the pycharm bint warning what even is a pycharm
+            pretty_print=True,  # ignore the pycharm bint warning what even is a pycharm
         )
 
         # re-parse as strict XML
@@ -40,10 +41,7 @@ class WebFetcher:
 
     # helper function to support our yaml and json broeren
     def _xml_to_dict(self, elem):
-        node = {
-            "tag": elem.tag,
-            "attributes": dict(elem.attrib)
-        }
+        node = {"tag": elem.tag, "attributes": dict(elem.attrib)}
 
         text = (elem.text or "").strip()
         if text:
@@ -79,10 +77,7 @@ class WebFetcher:
     # let the base class do the heavy lifting and use xml in the middle.
     # three identical methods, markdown, json, yaml
     def to_markdown(self) -> str:
-        return markdownify.markdownify(
-            self.to_pretty_xml(),
-            heading_style="ATX"
-        )
+        return markdownify.markdownify(self.to_pretty_xml(), heading_style="ATX")
 
     def to_json(self) -> str:
         xml = self.transport_xml()
@@ -98,9 +93,10 @@ class WebFetcher:
         xml_bytes = etree.tostring(
             self.transport_xml(),
             pretty_print=True,  # ur a bint u bint don't bint me
-            encoding="unicode"  # return str instead of bytes
+            encoding="unicode",  # return str instead of bytes
         )
         return xml_bytes
+
 
 # base class for plugins
 class CrepePlugin(BaseModel, ABC):
@@ -122,7 +118,3 @@ class CrepePlugin(BaseModel, ABC):
         soup = self.web.fetch()
         # pass the soup to process/lexer method for actual output
         return self.lexer(soup)
-
-
-
-
