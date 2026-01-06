@@ -1,0 +1,44 @@
+version: 1
+
+defaults:
+  timeout_seconds: 15
+  user_agent: "ccrepe/0.1 (+https://github.com/janearc/ccrepe)"
+  output_format: markdown
+  transport: xml
+
+fillings:
+  local_sqlite:
+    type: sqlalchemy
+    enabled: true
+    url: sqlite:///./ccrepe.db
+    echo: false
+    metadata:
+      store_raw_html: false
+      store_transport_xml: true
+      store_rendered:
+        - markdown
+        - json
+    tables:
+      documents: documents
+      sources: sources
+
+plugins:
+  substack:
+    enabled: true
+    class: ccrepe.plugins.substack.SubstackPlugin
+    rate_limit_seconds: 2
+    headers:
+      accept: text/html
+
+  medium:
+    enabled: false
+    class: ccrepe.plugins.medium.MediumPlugin
+
+targets:
+  - name: blog-post
+    plugin: medium
+    url: https://medium.com/@someone/some-post
+    output:
+      format: json
+      path: ./out/blog-post.json
+
